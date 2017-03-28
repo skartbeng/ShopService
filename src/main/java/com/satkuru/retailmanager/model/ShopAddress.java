@@ -7,20 +7,20 @@ public class ShopAddress {
     public ShopAddress() {
     }
 
-    public ShopAddress(int number, String postCode) {
+    public ShopAddress(String number, String postCode) {
         this.number = number;
         this.postCode = postCode;
     }
 
-    private int number;
+    private String number;
 
     private String postCode;
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 

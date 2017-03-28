@@ -14,7 +14,7 @@ public class Shop {
         this.shopAddress = shopAddress;
     }
 
-    public Shop(String name,int number,String postCode) {
+    public Shop(String name,String number,String postCode) {
         this.name = name;
         this.shopAddress = new ShopAddress(number,postCode);
     }
