@@ -14,6 +14,10 @@ public class Shop {
         this.shopAddress = shopAddress;
     }
 
+    public Shop(String name,int number,String postCode) {
+        this.name = name;
+        this.shopAddress = new ShopAddress(number,postCode);
+    }
     private String name;
 
     private ShopAddress shopAddress;

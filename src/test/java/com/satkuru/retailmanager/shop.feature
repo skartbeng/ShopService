@@ -2,6 +2,8 @@ Feature: Shop
 
   Scenario: a new shop
     Given A new shop
+    | name  | number | postCode |
+    | shop1 | 25     | NW9 0NS  |
     When I call the rest service
     Then there should be one new shop
 
