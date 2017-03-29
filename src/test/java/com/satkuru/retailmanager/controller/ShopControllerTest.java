@@ -1,10 +1,15 @@
 package com.satkuru.retailmanager.controller;
 
 
+import com.google.gson.Gson;
+import com.satkuru.retailmanager.AppConfig;
 import com.satkuru.retailmanager.Application;
+import com.satkuru.retailmanager.model.LatitudeLongitude;
 import com.satkuru.retailmanager.model.Shop;
 import com.satkuru.retailmanager.model.ShopAddress;
 import com.satkuru.retailmanager.repository.ShopRepository;
+import com.satkuru.retailmanager.util.GeoLocationImpl;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +57,8 @@ public class ShopControllerTest {
     private Shop shop;
 
     private List<Shop> shopList = new ArrayList<>();
+    @Autowired
+    AppConfig myConfig;
 
     @Autowired
     private ShopRepository shopRepository;
@@ -79,7 +86,7 @@ public class ShopControllerTest {
 
     @Test
     public void postShouldReturnCreated() throws Exception {
-        Shop shop1 = new Shop("Shop1",new ShopAddress(10,"E14 5HQ"));
+        Shop shop1 = new Shop("Shop1",new ShopAddress("10","RM2 6ER"));
 
         mockMvc.perform(post("/shops/")
                 .content(this.json(shop1))
@@ -89,8 +96,8 @@ public class ShopControllerTest {
 
     @Test
     public void postShouldReturnUpdated() throws Exception {
-        Shop shop1 = new Shop("Shop2",new ShopAddress(8,"E14 5HQ"));
-        Shop shop1edit = new Shop("Shop2",new ShopAddress(8,"E14 5HQ"));
+        Shop shop1 = new Shop("Shop2",new ShopAddress("8","E14 5HQ"));
+        Shop shop1edit = new Shop("Shop2",new ShopAddress("8","E14 5HQ"));
         mockMvc.perform(post("/shops/")
                 .content(this.json(shop1))
                 .contentType(contentType));
@@ -102,8 +109,27 @@ public class ShopControllerTest {
 
     @Test
     public void getNearestShop() throws Exception {
-        MvcResult mvcResult1 = mockMvc.perform(get("/findNearest/").requestAttr("", "").requestAttr("", "")).andExpect(status().isOk()).andReturn();
+        Shop shop1 = new Shop("Shop1",new ShopAddress("1","E14 5HQ"));
+        Shop shop2 = new Shop("Shop2",new ShopAddress("1","EC2N 2DB"));
+        Shop shop3 = new Shop("Shop3",new ShopAddress("2","RM2 6ER"));
+        Shop shop4 = new Shop("Shop4",new ShopAddress("26","RM2 6ER"));
 
+        LatitudeLongitude latLng = new GeoLocationImpl().getLatLng(myConfig.getApiKey(), shop4.getShopAddress().getNumber(), shop4.getShopAddress().getPostCode());
+        mockMvc.perform(post("/shops/")
+                .content(this.json(shop1))
+                .contentType(contentType));
+        mockMvc.perform(post("/shops/")
+                .content(this.json(shop2))
+                .contentType(contentType));
+        mockMvc.perform(post("/shops/")
+                .content(this.json(shop3))
+                .contentType(contentType));
+        MvcResult mvcResult1 = mockMvc.perform(get("/findNearest/").param("longitude", String.valueOf(latLng.lat)).param("latitude",String.valueOf(latLng.lng))).andExpect(status().isOk()).andReturn();
+
+        String contentAsString = mvcResult1.getResponse().getContentAsString();
+        Gson gson = new Gson();
+        Shop shop = gson.fromJson(contentAsString, Shop.class);
+        Assert.assertThat(shop.getName(),is(shop3.getName()));
     }
 
     protected String json(Object o) throws IOException {
